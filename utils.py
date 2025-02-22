@@ -18,47 +18,57 @@ def procesar_imagen(imagen, grid_size=5):
     filas, columnas = new_h // grid_size, new_w // grid_size
     laberinto = np.zeros((filas, columnas), dtype=int)
 
+    start = None
+    goals = []
+
     for i in range(filas):
         for j in range(columnas):
             bloque = imagen_resized[i * grid_size:(i + 1) * grid_size, j * grid_size:(j + 1) * grid_size]
 
             rojo = np.sum((bloque[:, :, 2] > 150) & (bloque[:, :, 1] < 100) & (bloque[:, :, 0] < 100))
             verde = np.sum((bloque[:, :, 1] > 150) & (bloque[:, :, 2] < 100) & (bloque[:, :, 0] < 100))
-            blanco = np.sum(bloque == 255)
-            negro = np.sum(bloque == 0)
+            blanco = np.sum((bloque[:, :, 0] > 200) & (bloque[:, :, 1] > 200) & (bloque[:, :, 2] > 200))
+            negro = np.sum((bloque[:, :, 0] < 50) & (bloque[:, :, 1] < 50) & (bloque[:, :, 2] < 50))
 
             if rojo > 20:
-                laberinto[i, j] = 2
+                laberinto[i, j] = 2  
+                start = (i, j)
             elif verde > 20:
-                laberinto[i, j] = 3
+                laberinto[i, j] = 3  
+                goals.append((i, j))
             elif blanco > negro:
-                laberinto[i, j] = 1
+                laberinto[i, j] = 1  
             else:
-                laberinto[i, j] = 0
+                laberinto[i, j] = 0  
 
-    return laberinto, filas, columnas
+    return laberinto, filas, columnas, start, goals
 
-
-
-def visualizar_laberinto(matriz, path=None):
+def visualizar_laberinto(matriz, path1=None, path2=None):
     filas, columnas = matriz.shape
     img = np.zeros((filas, columnas, 3), dtype=np.uint8)
 
     for i in range(filas):
         for j in range(columnas):
             if matriz[i, j] == 0:
-                img[i, j] = [0, 0, 0]  # Negro (pared)
+                img[i, j] = [0, 0, 0]  
             elif matriz[i, j] == 1:
-                img[i, j] = [255, 255, 255]  # Blanco (camino)
+                img[i, j] = [255, 255, 255]  
             elif matriz[i, j] == 2:
-                img[i, j] = [255, 0, 0]  # Rojo (inicio)
+                img[i, j] = [255, 0, 0]  
             elif matriz[i, j] == 3:
-                img[i, j] = [0, 255, 0]  # Verde (meta)
+                img[i, j] = [0, 255, 0]  
 
-    if path:
-        for (x, y) in path:
+
+    if path1:
+        for (x, y) in path1:
             if matriz[x, y] == 1:  
-                img[x, y] = [255, 0, 255] 
+                img[x, y] = [128, 0, 128] 
+
+ 
+    if path2:
+        for (x, y) in path2:
+            if matriz[x, y] == 1:  
+                img[x, y] = [0, 255, 255] 
 
     plt.figure(figsize=(10, 10))
     plt.imshow(img, interpolation='nearest')
