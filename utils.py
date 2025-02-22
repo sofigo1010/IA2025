@@ -38,10 +38,12 @@ def procesar_imagen(imagen, grid_size=5):
 
     return laberinto, filas, columnas
 
+
+
 def visualizar_laberinto(matriz, path=None):
     filas, columnas = matriz.shape
     img = np.zeros((filas, columnas, 3), dtype=np.uint8)
-    
+
     for i in range(filas):
         for j in range(columnas):
             if matriz[i, j] == 0:
@@ -52,11 +54,11 @@ def visualizar_laberinto(matriz, path=None):
                 img[i, j] = [255, 0, 0]  # Rojo (inicio)
             elif matriz[i, j] == 3:
                 img[i, j] = [0, 255, 0]  # Verde (meta)
-    
+
     if path:
-        for (i, j) in path:
-            if matriz[i, j] == 1:  
-                img[i, j] = [255, 0, 255]  # rosado el camino encontrado
+        for (x, y) in path:
+            if matriz[x, y] == 1:  
+                img[x, y] = [255, 0, 255] 
 
     plt.figure(figsize=(10, 10))
     plt.imshow(img, interpolation='nearest')
