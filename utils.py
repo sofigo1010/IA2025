@@ -27,31 +27,36 @@ def procesar_imagen(imagen, grid_size=5):
             blanco = np.sum(bloque == 255)
             negro = np.sum(bloque == 0)
 
-            if rojo > 20:  
-                laberinto[i, j] = 2  # Punto de inicio
+            if rojo > 20:
+                laberinto[i, j] = 2
             elif verde > 20:
-                laberinto[i, j] = 3  # Meta
+                laberinto[i, j] = 3
             elif blanco > negro:
-                laberinto[i, j] = 1  # Camino libre
+                laberinto[i, j] = 1
             else:
-                laberinto[i, j] = 0  # Pared
+                laberinto[i, j] = 0
 
     return laberinto, filas, columnas
 
-def visualizar_laberinto(matriz):
+def visualizar_laberinto(matriz, path=None):
     filas, columnas = matriz.shape
     img = np.zeros((filas, columnas, 3), dtype=np.uint8)
     
     for i in range(filas):
         for j in range(columnas):
             if matriz[i, j] == 0:
-                img[i, j] = [0, 0, 0]  # Negro
+                img[i, j] = [0, 0, 0]  # Negro (pared)
             elif matriz[i, j] == 1:
-                img[i, j] = [255, 255, 255]  # Blanco
+                img[i, j] = [255, 255, 255]  # Blanco (camino)
             elif matriz[i, j] == 2:
-                img[i, j] = [255, 0, 0]  # Rojo (Punto de inicio)
+                img[i, j] = [255, 0, 0]  # Rojo (inicio)
             elif matriz[i, j] == 3:
-                img[i, j] = [0, 255, 0]  # Verde (Meta)
+                img[i, j] = [0, 255, 0]  # Verde (meta)
+    
+    if path:
+        for (i, j) in path:
+            if matriz[i, j] == 1:  
+                img[i, j] = [255, 0, 255]  # rosado el camino encontrado
 
     plt.figure(figsize=(10, 10))
     plt.imshow(img, interpolation='nearest')
@@ -65,10 +70,3 @@ def visualizar_laberinto(matriz):
     plt.yticks(np.arange(0, filas, 1))
     
     plt.show()
-
-ruta_imagen = "Test2.bmp"
-imagen = cargar_imagen(ruta_imagen)
-
-grid_size = 6 
-matriz_laberinto, filas, columnas = procesar_imagen(imagen, grid_size)
-visualizar_laberinto(matriz_laberinto)
